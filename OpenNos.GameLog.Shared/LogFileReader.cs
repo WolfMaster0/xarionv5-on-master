@@ -1,0 +1,93 @@
+﻿// This file is part of the OpenNos NosTale Emulator Project.
+// 
+// This program is licensed under a deviated version of the Fair Source License,
+// granting you a non-exclusive, non-transferable, royalty-free and fully-paid-up
+// license, under all of the Licensor's copyright and patent rights, to use, copy, prepare
+// derivative works of, publicly perform and display the Software, subject to the
+// conditions found in the LICENSE file.
+// 
+// THIS FILE IS PROVIDED "AS IS", WITHOUT WARRANTY OR
+// CONDITION, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. THE AUTHORS HEREBY DISCLAIM ALL LIABILITY, WHETHER IN
+// AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE.
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace OpenNos.GameLog.Shared
+{
+    public class LogFileReader
+    {
+        public List<GameLogEntry> ReadLogFile(string path)
+        {
+            FileStream stream = null;
+            try
+            {
+                stream = File.OpenRead(path);
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    stream = null;
+                    string header = $"{br.ReadChar()}{br.ReadChar()}{br.ReadChar()}";
+                    byte version = br.ReadByte();
+                    if (header == "ONG")
+                    {
+                        switch (version)
+                        {
+                            case 1:
+                                return ReadVersion(br);
+
+                            default:
+                                throw new InvalidDataException("File Version invalid!");
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("File Header invalid!");
+                    }
+                }
+            }
+            finally
+            {
+                stream?.Dispose();
+            }
+        }
+
+        private List<GameLogEntry> ReadVersion(BinaryReader reader)
+        {
+            List<GameLogEntry> result = new List<GameLogEntry>();
+            int count = reader.ReadInt32();
+            while (count != 0)
+            {
+                DateTime timestamp =
+                    new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(reader.ReadDouble());
+                GameLogType gameLogType = (GameLogType) reader.ReadByte();
+                string sender = reader.ReadString();
+                long senderId = reader.ReadInt64();
+                int channelId = reader.ReadInt32();
+                Dictionary<string, string> content = new Dictionary<string, string>();
+                int contentCount = reader.ReadInt32();
+                for (int i = 0; i < contentCount; i++)
+                {
+                    string key = reader.ReadString();
+                    string val = reader.ReadString();
+                    content.Add(key, val);
+                }
+
+                result.Add(new GameLogEntry
+                {
+                    Timestamp = timestamp,
+                    GameLogType = gameLogType,
+                    CharacterName = sender,
+                    CharacterId = senderId,
+                    Content = content,
+                    ChannelId = channelId
+                });
+                count--;
+            }
+
+            return result;
+        }
+    }
+}

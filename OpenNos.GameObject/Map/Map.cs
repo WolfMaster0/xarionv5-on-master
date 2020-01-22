@@ -1,0 +1,229 @@
+﻿// This file is part of the OpenNos NosTale Emulator Project.
+// 
+// This program is licensed under a deviated version of the Fair Source License,
+// granting you a non-exclusive, non-transferable, royalty-free and fully-paid-up
+// license, under all of the Licensor's copyright and patent rights, to use, copy, prepare
+// derivative works of, publicly perform and display the Software, subject to the
+// conditions found in the LICENSE file.
+// 
+// THIS FILE IS PROVIDED "AS IS", WITHOUT WARRANTY OR
+// CONDITION, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. THE AUTHORS HEREBY DISCLAIM ALL LIABILITY, WHETHER IN
+// AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE.
+
+using OpenNos.DAL;
+using OpenNos.Data;
+using OpenNos.PathFinder;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using OpenNos.Core.ArrayExtensions;
+using OpenNos.Data.Interfaces;
+using OpenNos.GameObject.Event;
+using OpenNos.GameObject.Networking;
+
+namespace OpenNos.GameObject
+{
+    public class Map : IMapDTO
+    {
+        #region Members
+
+        private readonly Random _random;
+
+        #endregion
+
+        #region Instantiation
+
+        public Map(short mapId, byte[] data)
+        {
+            _random = new Random();
+            MapId = mapId;
+            Data = data;
+            LoadZone();
+            MapTypes = new List<MapTypeDTO>();
+            foreach (MapTypeMapDTO maptypemap in DAOFactory.MapTypeMapDAO.LoadByMapId(mapId).ToList())
+            {
+                MapTypeDTO maptype = DAOFactory.MapTypeDAO.LoadById(maptypemap.MapTypeId);
+                MapTypes.Add(maptype);
+            }
+
+            if (MapTypes.Count > 0 && MapTypes[0].RespawnMapTypeId != null)
+            {
+                long? respawnMapTypeId = MapTypes[0].RespawnMapTypeId;
+                long? returnMapTypeId = MapTypes[0].ReturnMapTypeId;
+                if (respawnMapTypeId != null)
+                {
+                    DefaultRespawn = DAOFactory.RespawnMapTypeDAO.LoadById((long)respawnMapTypeId);
+                }
+                if (returnMapTypeId != null)
+                {
+                    DefaultReturn = DAOFactory.RespawnMapTypeDAO.LoadById((long)returnMapTypeId);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Properties
+
+        public byte[] Data { get; set; }
+
+        public RespawnMapTypeDTO DefaultRespawn { get; }
+
+        public RespawnMapTypeDTO DefaultReturn { get; }
+
+        public GridPos[][] JaggedGrid { get; set; }
+
+        public short MapId { get; set; }
+
+        public List<MapTypeDTO> MapTypes { get; }
+
+        public int Music { get; set; }
+
+        public string Name { get; set; }
+
+        public bool ShopAllowed { get; set; }
+
+        internal int XLength { get; set; }
+
+        internal int YLength { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public static int GetDistance(Character character1, Character character2) => GetDistance(new MapCell { X = character1.PositionX, Y = character1.PositionY }, new MapCell { X = character2.PositionX, Y = character2.PositionY });
+
+        public static int GetDistance(MapCell p, MapCell q) => (int)Heuristic.Octile(Math.Abs(p.X - q.X), Math.Abs(p.Y - q.Y));
+
+        public IEnumerable<MonsterToSummon> GenerateMonsters(short vnum, short amount, bool move, List<EventContainer> deathEvents, bool isBonus = false, bool isHostile = true, bool isBoss = false)
+        {
+            List<MonsterToSummon> summonParameters = new List<MonsterToSummon>();
+            for (int i = 0; i < amount; i++)
+            {
+                MapCell cell = GetRandomPosition();
+                summonParameters.Add(new MonsterToSummon(vnum, cell, -1, move, isBonus: isBonus, isHostile: isHostile, isBoss: isBoss) { DeathEvents = deathEvents });
+            }
+            return summonParameters;
+        }
+
+        public List<NpcToSummon> GenerateNpcs(short vnum, short amount, List<EventContainer> deathEvents, bool isMate, bool isProtected, bool move)
+        {
+            List<NpcToSummon> summonParameters = new List<NpcToSummon>();
+            for (int i = 0; i < amount; i++)
+            {
+                MapCell cell = GetRandomPosition();
+                summonParameters.Add(new NpcToSummon(vnum, cell, -1, isProtected, isMate, move) { DeathEvents = deathEvents });
+            }
+            return summonParameters;
+        }
+
+        public MapCell GetRandomPosition()
+        {
+            List<MapCell> cells = new List<MapCell>();
+            for (short y = 0; y < YLength; y++)
+            {
+                for (short x = 0; x < XLength; x++)
+                {
+                    if (!IsBlockedZone(x, y))
+                    {
+                        cells.Add(new MapCell { X = x, Y = y });
+                    }
+                }
+            }
+            return cells.OrderBy(s => ServerManager.RandomNumber(0, int.MaxValue)).FirstOrDefault();
+        }
+
+        public bool IsBlockedZone(int x, int y)
+        {
+            try
+            {
+                if (x < XLength && y < YLength)
+                    return JaggedGrid?[x][y].IsWalkable() == false;
+                return true;
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+        }
+
+        internal bool GetFreePosition(ref short firstX, ref short firstY, byte xpoint, byte ypoint)
+        {
+            short minX = (short)(-xpoint + firstX);
+            short maxX = (short)(xpoint + firstX);
+
+            short minY = (short)(-ypoint + firstY);
+            short maxY = (short)(ypoint + firstY);
+
+            List<MapCell> cells = new List<MapCell>();
+            for (short y = minY; y <= maxY; y++)
+            {
+                for (short x = minX; x <= maxX; x++)
+                {
+                    if (x != firstX || y != firstY)
+                    {
+                        cells.Add(new MapCell { X = x, Y = y });
+                    }
+                }
+            }
+            foreach (MapCell cell in cells.OrderBy(s => _random.Next(int.MaxValue)))
+            {
+                if (!IsBlockedZone(firstX, firstY, cell.X, cell.Y))
+                {
+                    firstX = cell.X;
+                    firstY = cell.Y;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool IsBlockedZone(int firstX, int firstY, int mapX, int mapY)
+        {
+            for (int i = 1; i <= Math.Abs(mapX - firstX); i++)
+            {
+                if (IsBlockedZone(firstX + (Math.Sign(mapX - firstX) * i), firstY))
+                {
+                    return true;
+                }
+            }
+            for (int i = 1; i <= Math.Abs(mapY - firstY); i++)
+            {
+                if (IsBlockedZone(firstX, firstY + (Math.Sign(mapY - firstY) * i)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void LoadZone()
+        {
+            using (BinaryReader reader = new BinaryReader(new MemoryStream(Data)))
+            {
+                XLength = reader.ReadInt16();
+                YLength = reader.ReadInt16();
+
+                JaggedGrid = JaggedArrayExtensions.CreateJaggedArray<GridPos>(XLength, YLength);
+                for (short i = 0; i < YLength; ++i)
+                {
+                    for (short t = 0; t < XLength; ++t)
+                    {
+                        JaggedGrid[t][i] = new GridPos
+                        {
+                            Value = reader.ReadByte(),
+                            X = t,
+                            Y = i,
+                        };
+                    }
+                }
+            }
+        }
+
+        #endregion
+    }
+}

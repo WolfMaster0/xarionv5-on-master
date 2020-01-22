@@ -1,0 +1,54 @@
+﻿// This file is part of the OpenNos NosTale Emulator Project.
+// 
+// This program is licensed under a deviated version of the Fair Source License,
+// granting you a non-exclusive, non-transferable, royalty-free and fully-paid-up
+// license, under all of the Licensor's copyright and patent rights, to use, copy, prepare
+// derivative works of, publicly perform and display the Software, subject to the
+// conditions found in the LICENSE file.
+// 
+// THIS FILE IS PROVIDED "AS IS", WITHOUT WARRANTY OR
+// CONDITION, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. THE AUTHORS HEREBY DISCLAIM ALL LIABILITY, WHETHER IN
+// AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE.
+using OpenNos.XMLModel.Quest.Events;
+using System;
+using OpenNos.XMLModel.Shared;
+
+namespace OpenNos.XMLModel.Quest.Objects
+{
+    [Serializable]
+    public class Reward
+    {
+        public byte ForceLevelUp { get; set; }
+
+        public byte ForceJobUp { get; set; }
+
+        public byte ForceHeroUp { get; set; }
+
+        public long LevelExp { get; set; }
+
+        public long JobExp { get; set; }
+
+        public long HeroExp { get; set; }
+
+        public long Reputation { get; set; }
+
+        public long Gold { get; set; }
+
+        public short Buff { get; set; }
+
+        public Item[] GiftItems { get; set; }
+
+        public Item[] DrawOneItems { get; set; }
+
+        public bool DisplayRewardWindow { get; set; }
+
+        public TeleportTo TeleportPosition { get; set; }
+
+        public long QuestId { get; set; }
+
+        public Script Script { get; set; }
+    }
+}

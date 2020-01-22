@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE1BCBE7-EDB7-4564-A11E-8D90868DF9D0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenNos.XMLModel</RootNamespace>
+    <AssemblyName>OpenNos.XMLModel</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\ProjectRuleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\ProjectRuleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Event\Events\AddDrop.cs" />
+    <Compile Include="Event\Events\SpawnMonster.cs" />
+    <Compile Include="Event\Events\SpawnNpc.cs" />
+    <Compile Include="Event\Events\SpawnPortal.cs" />
+    <Compile Include="Event\Model\EventModel.cs" />
+    <Compile Include="Event\Objects\FinishEvents.cs" />
+    <Compile Include="Event\Objects\Globals.cs" />
+    <Compile Include="Event\Objects\EventItem.cs" />
+    <Compile Include="Event\Objects\Interval.cs" />
+    <Compile Include="Event\Objects\MonsterKillCount.cs" />
+    <Compile Include="Event\Objects\PlayerCount.cs" />
+    <Compile Include="Event\Objects\Script.cs" />
+    <Compile Include="Event\Objects\StartConditions.cs" />
+    <Compile Include="Quest\Objects\Objective.cs" />
+    <Compile Include="ScriptedInstance\Events\ChangePortalType.cs" />
+    <Compile Include="ScriptedInstance\Events\ControlMonsterInRange.cs" />
+    <Compile Include="ScriptedInstance\Events\Effect.cs" />
+    <Compile Include="ScriptedInstance\Events\End.cs" />
+    <Compile Include="ScriptedInstance\Events\GenerateClock.cs" />
+    <Compile Include="ScriptedInstance\Events\GenerateMapClock.cs" />
+    <Compile Include="ScriptedInstance\Events\Move.cs" />
+    <Compile Include="ScriptedInstance\Events\NpcDialog.cs" />
+    <Compile Include="ScriptedInstance\Events\OnAreaEntry.cs" />
+    <Compile Include="ScriptedInstance\Events\OnCharacterDiscoveringMap.cs" />
+    <Compile Include="ScriptedInstance\Events\OnDeath.cs" />
+    <Compile Include="ScriptedInstance\Events\OnDisable.cs" />
+    <Compile Include="ScriptedInstance\Events\OnEnable.cs" />
+    <Compile Include="ScriptedInstance\Events\OnFirstEnable.cs" />
+    <Compile Include="ScriptedInstance\Events\OnLockerOpen.cs" />
+    <Compile Include="ScriptedInstance\Events\OnMapClean.cs" />
+    <Compile Include="ScriptedInstance\Events\OnMoveOnMap.cs" />
+    <Compile Include="ScriptedInstance\Events\OnNoticing.cs" />
+    <Compile Include="ScriptedInstance\Events\OnStop.cs" />
+    <Compile Include="ScriptedInstance\Events\OnTarget.cs" />
+    <Compile Include="ScriptedInstance\Events\OnTimeout.cs" />
+    <Compile Include="ScriptedInstance\Events\OnTraversal.cs" />
+    <Compile Include="Quest\Events\Script.cs" />
+    <Compile Include="Quest\Events\TeleportTo.cs" />
+    <Compile Include="ScriptedInstance\Events\Roam.cs" />
+    <Compile Include="ScriptedInstance\Events\SendMessage.cs" />
+    <Compile Include="ScriptedInstance\Events\SendPacket.cs" />
+    <Compile Include="ScriptedInstance\Events\SetButtonLockers.cs" />
+    <Compile Include="ScriptedInstance\Events\SetMonsterLockers.cs" />
+    <Compile Include="ScriptedInstance\Events\SpawnButton.cs" />
+    <Compile Include="ScriptedInstance\Events\SpawnPortal.cs" />
+    <Compile Include="ScriptedInstance\Events\StartClock.cs" />
+    <Compile Include="ScriptedInstance\Events\SummonMonster.cs" />
+    <Compile Include="ScriptedInstance\Events\SummonMonsters.cs" />
+    <Compile Include="ScriptedInstance\Events\SummonNpc.cs" />
+    <Compile Include="ScriptedInstance\Events\Teleport.cs" />
+    <Compile Include="ScriptedInstance\Events\ThrowItem.cs" />
+    <Compile Include="Quest\Objects\QuestGiver.cs" />
+    <Compile Include="Quest\Objects\Reward.cs" />
+    <Compile Include="Shared\Name.cs" />
+    <Compile Include="ScriptedInstance\Objects\Wave.cs" />
+    <Compile Include="Quest\Model\QuestModel.cs" />
+    <Compile Include="ScriptedInstance\Objects\Globals.cs" />
+    <Compile Include="ScriptedInstance\Model\ScriptedInstanceModel.cs" />
+    <Compile Include="ScriptedInstance\Objects\CreateMap.cs" />
+    <Compile Include="ScriptedInstance\Objects\Gold.cs" />
+    <Compile Include="ScriptedInstance\Objects\Id.cs" />
+    <Compile Include="ScriptedInstance\Objects\InstanceEvent.cs" />
+    <Compile Include="Shared\Item.cs" />
+    <Compile Include="ScriptedInstance\Objects\Label.cs" />
+    <Compile Include="ScriptedInstance\Objects\Level.cs" />
+    <Compile Include="ScriptedInstance\Objects\Lives.cs" />
+    <Compile Include="ScriptedInstance\Objects\Reputation.cs" />
+    <Compile Include="ScriptedInstance\Objects\StartPosition.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OpenNos.Domain\OpenNos.Domain.csproj">
+      <Project>{20addddd-dad9-44f3-9beb-026c73090660}</Project>
+      <Name>OpenNos.Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
